@@ -1,0 +1,45 @@
+import machine # import the machine module
+import utime # import the utime module
+
+led = machine.Pin(25, machine.Pin.OUT) # create a Pin object for the onboard LED
+red = machine.Pin(18, machine.Pin.OUT)
+amber = machine.Pin(19, machine.Pin.OUT)
+green = machine.Pin(20, machine.Pin.OUT)
+red(1)
+amber(1)
+green(1)
+led(1)
+utime.sleep(2)
+red(0)
+amber(0)
+green(0)
+led(0)
+
+sensor_temp = machine.ADC(4) # create an ADC object on pin 4
+conversion_factor = 3.3 / (65535) # calculate the conversion factor
+
+while True: # loop forever
+    reading = sensor_temp.read_u16() * conversion_factor # read the sensor value and convert it to voltage
+    temperature = 27 - (reading - 0.706)/0.001721 # calculate the temperature from the voltage
+    
+    utime.sleep(1) # wait for 0.5 seconds
+    if 0.00 <= temperature <= 19.00:
+        led.value(0)
+        green.value(1)
+        
+    if 20.00 <= temperature <= 25.00:
+        green.value(0)
+        amber.value(1)
+        
+    if 26.00 <= temperature <= 30.20:
+        red.value(1)
+        utime.sleep(1)
+        red.value(0)
+        utime.sleep(1)
+        red.value(1)
+        
+    if temperature < 3.00:
+        red.value(0)
+        led.value(1)
+        print('im cold')
+    print( temperature, "°C") # print the temperature in Celsius
